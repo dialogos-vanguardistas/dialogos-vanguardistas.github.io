@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Diálogos vanguardistas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;900&family=IBM+Plex+Mono:wght@400;600&family=Instrument+Sans:wght@400;600&family=Jost:wght@500;700&display=swap" rel="stylesheet">
+<style>
+/* VOICE: una muestra de museo, seria y enérgica; el catálogo habla con los códigos de las tres vanguardias.
+   IDEA: un recorrido por salas; cada sala ordena sus obras como lo haría su movimiento (flotar / empujar / ordenar).
+   PICTURE: las obras reales, más formas primarias (cuadrado, cuña, círculo) que hacen de navegación.
+   COLOUR and TYPE: lienzo crudo, negro, carmín, amarillo, azul Bauhaus; Big Shoulders + Instrument Sans + IBM Plex Mono.
+   LAYOUT: 17 pantallas lineales, una por vez, con índice ▲■● y flechas. */
+:root{color-scheme:light dark;
+--bg:light-dark(#e9e1cf,#151412);--ink:light-dark(#1b1a17,#ece5d4);--soft:light-dark(#6f6757,#a89f8c);
+--line:light-dark(#b9af9c,#3a3731);--card:light-dark(#f3eee2,#211f1b);
+--red:#b3262e;--yel:#e0b11e;--blu:#1f4e9c;--blk:#1b1a17;--cre:#e9e1cf}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+html,body{height:100%}html{scroll-padding-top:70px}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 "Instrument Sans",system-ui,sans-serif;overflow-x:clip}
+h1,h2,h3{font-family:"Big Shoulders Display",Impact,sans-serif;font-weight:900;line-height:.92;margin:0;text-transform:uppercase;letter-spacing:.01em}
+h2{font-size:clamp(44px,7vw,104px)}h3{font-size:clamp(24px,2.6vw,34px)}
+.mono{font:13px/1.45 "IBM Plex Mono",monospace}
+p{max-width:64ch}
+button{font:inherit;cursor:pointer;color:inherit}
+:focus-visible{outline:3px solid var(--yel);outline-offset:2px}
+
+/* ---------- marco ---------- */
+header{position:fixed;inset:0 0 auto;z-index:20;display:flex;gap:12px;align-items:center;justify-content:space-between;padding:10px max(3vw,14px);background:var(--bg);border-bottom:1px solid var(--line)}
+.brand{font:700 20px/1 "Big Shoulders Display";text-transform:uppercase;letter-spacing:.04em;background:none;border:0;padding:8px 0}
+.brand b{display:inline-block;width:11px;height:11px;background:var(--red);margin-right:6px;transform:rotate(-12deg)}
+nav.dots{display:flex;flex-wrap:wrap;gap:4px;justify-content:flex-end}
+nav.dots button{width:30px;height:30px;border:0;background:none;padding:0;display:grid;place-items:center}
+nav.dots i{display:block;width:10px;height:10px;background:var(--line);transition:transform .25s,background .25s}
+nav.dots .s i{background:var(--soft)}nav.dots .c i{clip-path:polygon(0 50%,100% 0,100% 100%)}nav.dots .b i{border-radius:50%}
+nav.dots button[aria-current=true] i{background:var(--red);transform:scale(1.5)}
+.bar{position:fixed;left:0;top:0;height:3px;background:var(--red);z-index:30;transition:width .4s}
+footer.ctl{position:fixed;inset:auto 0 0;z-index:20;display:flex;justify-content:space-between;align-items:center;gap:10px;padding:8px max(3vw,14px);background:var(--bg);border-top:1px solid var(--line)}
+.ctl button{min-height:44px;padding:0 18px;border:2px solid var(--ink);background:none;font:600 14px "IBM Plex Mono"}
+.ctl button:hover{background:var(--ink);color:var(--bg)}
+.ctl .where{font:13px "IBM Plex Mono";color:var(--soft);text-align:center}
+
+main{padding:64px 0 66px}
+section.scr{display:none;min-height:calc(100dvh - 130px);padding:clamp(24px,4vw,56px) max(5vw,16px);position:relative;overflow:hidden}
+section.scr.on{display:block;animation:in .5s ease both}
+@keyframes in{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.wrap{max-width:1240px;margin:0 auto;position:relative}
+.kick{font:600 13px "IBM Plex Mono";color:var(--red);margin:0 0 10px}
+.slot{border:2px dashed var(--red);padding:16px 18px;background:color-mix(in srgb,var(--red) 6%,transparent);font-size:15px}
+.sala-txt{font-size:clamp(16px,1.25vw,19px);line-height:1.55;max-width:60ch}.panel p{margin:0;line-height:1.5}.s-sup .sala-txt{position:relative;z-index:2;background:light-dark(#f5f2ea,#0f0e0d);box-shadow:0 0 0 10px light-dark(#f5f2ea,#0f0e0d)}.intro .two>figure{min-width:0;position:relative;z-index:1}.intro .two>figure img{width:100%;height:auto;max-height:56vh;object-fit:contain;object-position:left top;display:block}.intro .two>div{position:relative;z-index:2;min-width:0}.ensayo-txt p{margin:0 0 14px;line-height:1.6;font-size:clamp(15px,1.15vw,18px)}.dlg-txt{max-width:75ch;line-height:1.6;margin-top:18px}.biblio{padding-left:18px;margin:0 0 12px;line-height:1.5}
+.slot b{display:block;font:600 12px "IBM Plex Mono";color:var(--red);margin-bottom:4px}
+.lead{font-size:clamp(17px,1.6vw,20px)}
+.two{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:clamp(20px,4vw,56px);align-items:start}
+@media(max-width:820px){.two{grid-template-columns:minmax(0,1fr)}}
+
+/* ---------- tapa ---------- */
+#tapa{background:var(--blk);color:var(--cre);padding:0}
+#tapa .photo{position:absolute;inset:0;background:url(img/expo-0-10.jpg) center/cover;filter:grayscale(1) contrast(1.1);opacity:.42}
+#tapa .in{position:relative;min-height:calc(100dvh - 130px);display:grid;align-content:end;padding:clamp(24px,5vw,72px) max(5vw,16px)}
+#tapa h1{font-size:clamp(64px,13vw,200px);line-height:.82}
+#tapa h1 span{display:block}#tapa h1 span:nth-child(2){color:var(--red);transform:rotate(-4deg);transform-origin:left}
+#tapa .names{font:600 clamp(13px,1.3vw,16px) "IBM Plex Mono";margin-top:22px;max-width:70ch;color:#d9d1bf}
+.sq{position:absolute;background:var(--cre)}
+#tapa .f1{width:clamp(70px,11vw,170px);aspect-ratio:1;background:var(--blk);outline:10px solid var(--cre);top:9%;right:8%;transform:rotate(-8deg)}
+#tapa .f2{width:clamp(120px,24vw,360px);height:clamp(60px,10vw,150px);background:var(--red);clip-path:polygon(0 50%,100% 0,100% 100%);top:30%;right:22%;animation:wedge 5s ease-in-out infinite alternate}
+#tapa .f3{width:clamp(60px,8vw,120px);aspect-ratio:1;border-radius:50%;background:var(--blu);top:52%;right:6%}
+#tapa .f4{width:clamp(50px,6vw,90px);aspect-ratio:1;background:var(--yel);clip-path:polygon(50% 0,100% 100%,0 100%);top:16%;right:34%}
+@keyframes wedge{to{transform:translateX(-24px) rotate(-3deg)}}
+#tapa .cap{position:absolute;right:max(5vw,16px);bottom:14px;font:11px "IBM Plex Mono";color:#a89f8c}
+
+/* ---------- índice ---------- */
+.toc{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px;margin-top:28px;padding:0;list-style:none}
+.toc button{width:100%;text-align:left;min-height:64px;border:0;border-left:8px solid var(--line);background:var(--card);padding:12px 14px;display:flex;gap:12px;align-items:baseline}
+.toc button:hover{border-left-color:var(--red)}
+.toc .n{font:600 13px "IBM Plex Mono";color:var(--soft)}.toc .t{font:700 20px/1.05 "Big Shoulders Display";text-transform:uppercase}
+
+/* ---------- códigos ---------- */
+.codes{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin-top:24px}
+.code{background:var(--card);padding:18px;border-top:6px solid var(--ink)}
+.code h3{margin-bottom:10px}
+.sw{display:flex;gap:6px;flex-wrap:wrap}.sw span{width:46px;height:46px;display:grid;place-items:end start;padding:3px;font:10px "IBM Plex Mono";color:#fff}
+.shapes{display:flex;gap:14px;align-items:end;margin:6px 0 10px}
+.shapes i{width:44px;height:44px;display:block}
+.tri{background:var(--yel);clip-path:polygon(50% 0,100% 100%,0 100%)}.squ{background:var(--red)}.cir{background:var(--blu);border-radius:50%}
+
+/* ---------- salas ---------- */
+.sala-head{display:flex;flex-wrap:wrap;gap:12px 28px;align-items:end;margin-bottom:22px}
+.sala-head .mono{color:var(--soft)}
+.intro .hero{width:100%;aspect-ratio:4/3;object-fit:cover;background:var(--card)}
+.s-sup h2{transform:rotate(-5deg);transform-origin:left bottom}
+.s-sup .deco{position:absolute;right:2%;top:0;width:110px;aspect-ratio:1;background:var(--ink)}
+.s-sup .beam{position:absolute;left:30%;right:-10%;top:46%;height:12px;background:var(--red);transform:rotate(-12deg);z-index:0}
+.s-con .band{position:absolute;left:-6%;right:-6%;top:clamp(10px,3vw,40px);height:clamp(90px,12vw,170px);background:var(--red);transform:rotate(-7deg);z-index:0}
+.s-con h2{color:var(--cre);transform:rotate(-7deg);transform-origin:left;position:relative}
+.s-con .wedge{width:clamp(120px,22vw,300px);height:clamp(50px,8vw,110px);background:var(--red);clip-path:polygon(0 50%,100% 0,100% 100%);margin:12px 0}
+.s-bau{background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);background-size:120px 120px}
+.s-bau .rule{height:12px;background:var(--ink);margin:14px 0 22px}
+
+/* obras */
+.works{position:relative;display:grid;gap:clamp(18px,3vw,40px);grid-template-columns:repeat(2,minmax(0,1fr))}
+@media(max-width:700px){.works{grid-template-columns:minmax(0,1fr)}}
+.work{position:relative;background:var(--card);padding:14px;transition:transform .45s cubic-bezier(.2,.8,.2,1),box-shadow .45s}
+.work figure{margin:0;position:relative;height:clamp(180px,22vw,280px);display:grid;place-items:center;background:var(--bg)}
+.work img{max-width:100%;max-height:100%;object-fit:contain;display:block}
+.ph{width:100%;height:100%;display:grid;place-content:center;text-align:center;gap:6px;padding:16px;border:2px dashed var(--line);font:12px "IBM Plex Mono";color:var(--soft)}
+.ph strong{font:700 22px/1 "Big Shoulders Display";color:var(--ink);text-transform:uppercase}
+.work .cap{font:600 13px/1.35 "IBM Plex Mono";margin:12px 0 10px}
+.btns{display:flex;flex-wrap:wrap;gap:6px}
+.btns button{min-height:44px;padding:0 12px;border:2px solid var(--ink);background:var(--bg);font:600 12px "IBM Plex Mono"}
+.btns button[aria-pressed=true]{background:var(--ink);color:var(--bg)}
+.panel{position:absolute;inset:14px 14px auto;height:clamp(180px,22vw,280px);overflow:auto;background:color-mix(in srgb,var(--blk) 92%,transparent);color:var(--cre);padding:18px;font-size:15px;opacity:0;pointer-events:none;transition:opacity .3s,transform .3s;transform:translateY(8px)}
+.panel.show{opacity:1;pointer-events:auto;transform:none}
+.panel h4{margin:0 0 8px;font:600 12px "IBM Plex Mono";color:var(--yel)}
+.panel dl{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;margin:0;font:13px/1.45 "IBM Plex Mono"}.panel dt{color:#a89f8c}.panel dd{margin:0}
+.panel .slot{border-color:var(--yel);color:var(--cre);background:none}.panel .slot b{color:var(--yel)}
+.work:hover .panel.f0,.work:focus-within .panel.show{opacity:1}
+/* micro-interacciones por movimiento */
+.s-sup .work{box-shadow:0 18px 40px -26px #000}
+.s-sup .work:nth-child(1){transform:rotate(-4deg)}.s-sup .work:nth-child(2){transform:rotate(5deg) translateY(-18px)}
+.s-sup .work:nth-child(3){transform:rotate(2deg) translateX(30px)}.s-sup .work:nth-child(4){transform:rotate(-7deg) translateY(16px)}
+.s-sup .work:hover{transform:rotate(0) translateY(-10px) scale(1.02);z-index:3}
+.s-con .works{transform:rotate(-4deg)}
+.s-con .work{border-left:10px solid var(--red)}
+.s-con .work:nth-child(odd){margin-top:40px}
+.s-con .work:hover{transform:translate(14px,-14px);box-shadow:-14px 14px 0 var(--blk)}
+.s-con.on .work{animation:diag .6s cubic-bezier(.2,.8,.2,1) both}.s-con.on .work:nth-child(2){animation-delay:.08s}.s-con.on .work:nth-child(3){animation-delay:.16s}.s-con.on .work:nth-child(4){animation-delay:.24s}
+@keyframes diag{from{opacity:0;transform:translate(-80px,60px)}to{opacity:1;transform:none}}
+.s-bau .works{gap:0;border:6px solid var(--ink)}
+.s-bau .work{border:3px solid var(--ink);background:var(--bg)}
+.s-bau .work:hover{background:var(--card)}
+.s-bau.on .work{animation:snap .35s steps(3) both}.s-bau.on .work:nth-child(2){animation-delay:.1s}.s-bau.on .work:nth-child(3){animation-delay:.2s}.s-bau.on .work:nth-child(4){animation-delay:.3s}
+@keyframes snap{from{opacity:0;clip-path:inset(0 100% 0 0)}to{opacity:1;clip-path:inset(0)}}
+.legend{display:flex;gap:14px;align-items:center;font:12px "IBM Plex Mono";color:var(--soft);margin-top:14px}
+.legend .shapes i{width:22px;height:22px}
+
+/* ---------- diálogos ---------- */
+.dlg{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin:22px 0}
+@media(max-width:760px){.dlg{grid-template-columns:minmax(0,1fr)}}
+.dlg figure{margin:0;background:var(--card);padding:10px;transition:opacity .3s,transform .3s}
+.dlg:hover figure{opacity:.45}.dlg figure:hover{opacity:1;transform:translateY(-6px)}
+.dlg .box{height:clamp(180px,24vw,300px);display:grid;place-items:center;background:var(--bg)}
+.dlg img{max-width:100%;max-height:100%;object-fit:contain}
+.dlg figcaption{font:600 12px "IBM Plex Mono";margin-top:8px}
+.tag{display:inline-flex;gap:6px;align-items:center;font:12px "IBM Plex Mono";padding:3px 8px;margin:6px 6px 0 0;background:var(--bg);border:1px solid var(--line)}
+.wipe{position:relative;height:clamp(260px,40vw,480px);margin:22px 0;background:var(--card);overflow:hidden;user-select:none}
+.wipe .lay{position:absolute;inset:0;display:grid;place-items:center;padding:14px}
+.wipe .lay img{max-width:100%;max-height:100%;object-fit:contain}
+.wipe .top{clip-path:inset(0 0 0 var(--x,50%));background:var(--card)}
+.wipe .knob{position:absolute;top:0;bottom:0;left:var(--x,50%);width:4px;background:var(--red);transform:translateX(-2px);pointer-events:none}
+.wipe .knob::after{content:"◀ ▶";position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:var(--red);color:#fff;font:600 12px "IBM Plex Mono";padding:8px 10px;white-space:nowrap}
+.wipe input{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:ew-resize}
+.wipe .lab{position:absolute;bottom:10px;font:600 12px "IBM Plex Mono";background:var(--blk);color:var(--cre);padding:4px 8px;z-index:2}
+
+/* ---------- línea de tiempo ---------- */
+.tl{position:relative;margin:26px 0 10px;padding-top:28px}
+.years{position:relative;height:24px;border-bottom:2px solid var(--ink);font:12px "IBM Plex Mono"}
+.years span{position:absolute;transform:translateX(-50%);bottom:4px}
+.lane{position:relative;height:64px;border-bottom:1px solid var(--line)}
+.lane .span{position:absolute;top:22px;height:20px}
+.lane .name{position:absolute;left:0;top:2px;font:600 12px "IBM Plex Mono"}
+.ev{position:absolute;top:16px;width:32px;height:32px;margin-left:-16px;border:0;padding:0;background:none;display:grid;place-items:center;z-index:2}
+.ev i{width:18px;height:18px;display:block;background:var(--ink);border:3px solid var(--bg);transition:transform .2s}
+.ev:hover i,.ev[aria-pressed=true] i{transform:scale(1.5);background:var(--red)}
+.l-sup .span{background:var(--blk)}.l-con .span{background:var(--red)}.l-bau .span{background:var(--blu)}.l-ctx .span{background:var(--yel)}
+.l-con .ev i{clip-path:polygon(0 50%,100% 0,100% 100%);border:0}.l-bau .ev i{border-radius:50%}
+.evbox{display:grid;grid-template-columns:120px minmax(0,1fr);gap:18px;background:var(--card);padding:18px;border-left:8px solid var(--red);min-height:110px;margin-top:18px}
+.evbox .y{font:900 56px/1 "Big Shoulders Display"}
+@media(max-width:600px){.evbox{grid-template-columns:minmax(0,1fr)}.years span:nth-child(even){display:none}}
+
+/* ---------- cierre ---------- */
+.cierre{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:clamp(20px,4vw,48px);align-items:center}
+@media(max-width:820px){.cierre{grid-template-columns:minmax(0,1fr)}}
+.gif{background:var(--blk);padding:12px}.gif img{width:100%;display:block}
+.stage{position:relative;height:clamp(260px,32vw,380px);background:var(--card);overflow:hidden}
+.stage i{position:absolute;display:block;transition:all 1s cubic-bezier(.6,0,.2,1)}
+.stage .a{width:34%;aspect-ratio:1;background:var(--blk);left:33%;top:20%}
+.stage .b{width:44%;height:26%;background:var(--red);clip-path:polygon(0 50%,100% 0,100% 100%);left:28%;top:37%}
+.stage .c{width:22%;aspect-ratio:1;border-radius:50%;background:var(--blu);left:39%;top:30%}
+.stage .d{width:18%;aspect-ratio:1;background:var(--yel);clip-path:polygon(50% 0,100% 100%,0 100%);left:41%;top:34%}
+.stage.split .a{left:4%;top:8%;transform:rotate(-8deg)}
+.stage.split .b{left:52%;top:10%;transform:rotate(-14deg)}
+.stage.split .c{left:72%;top:62%}.stage.split .d{left:14%;top:64%;transform:rotate(12deg)}
+.big{min-height:48px;padding:0 20px;border:0;background:var(--red);color:#fff;font:600 14px "IBM Plex Mono";margin-top:12px}
+
+/* ---------- créditos ---------- */
+.cred{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:24px;margin-top:22px}
+.cred ol,.cred ul{padding-left:20px;margin:8px 0}.cred li{margin:6px 0;font-size:15px}
+/* ===== v2: esencia por movimiento ===== */
+.cyr{font:600 clamp(12px,1.1vw,14px)/1 "IBM Plex Mono",monospace;letter-spacing:.25em;color:var(--soft)}
+.vert{position:absolute;writing-mode:vertical-rl;transform:rotate(180deg);left:max(1.2vw,6px);top:12%;z-index:1}
+/* transiciones de pantalla según la vanguardia */
+.s-sup.on{animation:float-in .9s cubic-bezier(.2,.8,.2,1) both}
+@keyframes float-in{from{opacity:0;transform:translateY(30px) rotate(-1.5deg)}to{opacity:1;transform:none}}
+.s-con.on{animation:diag-in .7s cubic-bezier(.7,0,.2,1) both}
+@keyframes diag-in{from{clip-path:polygon(0 0,0 0,0 0,0 0)}to{clip-path:polygon(0 0,140% 0,100% 100%,0 140%)}}
+.s-bau.on{animation:grid-in .5s steps(4) both}
+@keyframes grid-in{from{clip-path:inset(0 0 100% 0)}to{clip-path:inset(0)}}
+/* Sala I: vacío blanco infinito */
+.s-sup{background:light-dark(#f5f2ea,#0f0e0d)}
+.s-sup .work{animation:bob 6s ease-in-out infinite alternate}
+.s-sup .work:nth-child(2){animation-delay:-2s}.s-sup .work:nth-child(3){animation-delay:-4s}
+@keyframes bob{to{translate:0 -10px}}
+.s-sup .dot{position:absolute;width:70px;aspect-ratio:1;border-radius:50%;background:var(--ink);right:12%;bottom:12%}
+/* Sala II: campo rojo y negro en diagonal, como el afiche soviético */
+.intro.s-con{background:linear-gradient(166deg,var(--blk) 0 28%,var(--red) 28% 50%,var(--bg) 50%)}
+.intro.s-con .slot{background:var(--bg)}.intro.s-con>.wrap{padding-top:clamp(20px,3vw,44px)}
+.intro.s-con .kick{color:var(--cre);background:var(--blk);display:inline-block;padding:4px 8px}
+.s-con .cyr{color:var(--cre)}
+/* Sala III: retícula, primarios y minúscula universal */
+.s-bau h2.lower{font-family:Jost,"Instrument Sans",sans-serif;text-transform:none;font-weight:700;letter-spacing:-.02em}
+.s-bau .blocks{position:absolute;right:max(5vw,16px);top:clamp(20px,3vw,40px);display:flex;gap:0}
+.s-bau .blocks i{width:clamp(44px,6vw,80px);height:clamp(44px,6vw,80px);display:block}
+/* tapa interactiva */
+#tapa .f1,#tapa .f2,#tapa .f3,#tapa .f4{transition:translate .25s ease-out}
+#tapa.on .f1{animation:assemble1 1.2s cubic-bezier(.2,.8,.2,1) both}
+#tapa.on .f3{animation:assemble2 1.4s cubic-bezier(.2,.8,.2,1) both}
+@keyframes assemble1{from{opacity:0;transform:translate(160px,-120px) rotate(40deg)}}
+@keyframes assemble2{from{opacity:0;transform:translate(120px,160px) scale(.3)}}
+#tapa .cyr{position:absolute;top:24px;left:max(5vw,16px);color:#a89f8c}
+.enter{margin-top:22px;min-height:52px;padding:0 24px;border:0;background:var(--red);color:#fff;font:600 15px "IBM Plex Mono";width:max-content}
+.enter:hover{background:var(--yel);color:var(--blk)}
+/* modos de diálogo: informar · comparar · relacionar · fusionar */
+.modes{display:flex;flex-wrap:wrap;gap:6px;margin:18px 0 0}
+.modes button{min-height:44px;padding:0 16px;border:2px solid var(--ink);background:none;font:600 13px "IBM Plex Mono"}
+.modes button[aria-pressed=true]{background:var(--ink);color:var(--bg)}
+.trio{position:relative;height:clamp(300px,36vw,440px);margin-top:16px}
+.trio .cell{position:absolute;top:0;height:100%;width:calc(33.33% - 10px);transition:all .9s cubic-bezier(.7,0,.2,1);background:var(--card)}
+.trio .cell:nth-child(1){left:0}.trio .cell:nth-child(2){left:calc(33.33% + 5px)}.trio .cell:nth-child(3){left:calc(66.66% + 10px)}
+.trio .cell svg{width:100%;height:calc(100% - 34px);display:block}
+.trio .cell span{display:block;font:600 12px "IBM Plex Mono";padding:8px 10px;height:34px}
+.trio.fused .cell{left:calc(33.33% + 5px)!important;background:transparent;mix-blend-mode:multiply}
+.trio.fused .cell:first-child{background:var(--card)}
+.trio.fused .cell span{opacity:0}
+.trio.rel .cell svg .key{stroke:var(--red);stroke-width:3;stroke-dasharray:6 5;fill:none}
+.trio .key{fill:none;stroke:none;transition:stroke .4s}
+@media(prefers-color-scheme:dark){:root:not([data-theme=light]) .trio.fused .cell{mix-blend-mode:screen}}
+:root[data-theme=dark] .trio.fused .cell{mix-blend-mode:screen}
+.fusenote{font:600 13px "IBM Plex Mono";min-height:22px;margin-top:10px;color:var(--red)}
+/* máquina tipográfica */
+.typo{display:grid;grid-template-columns:minmax(0,1fr) 280px;gap:18px;margin-top:16px}
+@media(max-width:820px){.typo{grid-template-columns:minmax(0,1fr)}}
+.tstage{position:relative;height:clamp(260px,32vw,400px);overflow:hidden;background:var(--card)}
+.tstage .w{position:absolute;inset:0;display:grid;place-items:center;transition:all .6s}
+.tstage .l{display:inline-block;transition:transform .8s cubic-bezier(.2,.8,.2,1),color .4s}
+.t-sup{font:900 clamp(40px,7vw,96px)/1 "Big Shoulders Display";color:var(--ink)}
+.t-con{font:900 clamp(48px,9vw,128px)/.85 "Big Shoulders Display";text-transform:uppercase;color:var(--cre)}
+.t-con-bg{position:absolute;left:-10%;right:-10%;top:30%;height:44%;background:var(--red);transform:rotate(-10deg);transition:opacity .5s}
+.t-con-bar{position:absolute;left:8%;width:30%;bottom:12%;height:22px;background:var(--blk);transform:rotate(-10deg);transition:opacity .5s}
+.t-bau{font:700 clamp(40px,7vw,96px)/1 Jost,"Instrument Sans",sans-serif;text-transform:lowercase;color:var(--ink);letter-spacing:-.02em}
+.tstage .l.t-con{color:var(--red)}.tstage .w>div{white-space:nowrap}
+.tside label{display:block;font:600 12px "IBM Plex Mono";margin-bottom:6px}
+.tside input{width:100%;min-height:48px;font:600 18px "IBM Plex Mono";padding:0 12px;border:2px solid var(--ink);background:var(--bg);color:var(--ink);text-transform:uppercase}
+.tside .modes{flex-direction:column}
+.tside p{font-size:14px}
+/* manifiesto sonoro */
+.pads{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:12px}
+.pad{aspect-ratio:1;border:0;background:var(--card);display:grid;place-items:center;padding:14px;position:relative}
+.pad i{width:70%;height:70%;display:block;transition:transform .15s}
+.pad.hit i{transform:scale(1.25) rotate(-8deg)}
+.pad .pq{background:var(--blk)}.pad .pw{background:var(--red);clip-path:polygon(0 50%,100% 0,100% 100%);height:45%}
+.pad .pt{background:var(--yel);clip-path:polygon(50% 0,100% 100%,0 100%)}.pad .pc{background:var(--blu);border-radius:50%}
+.pad small{position:absolute;bottom:4px;left:6px;font:11px "IBM Plex Mono"}
+.manif{font:900 clamp(22px,2.6vw,34px)/1.05 "Big Shoulders Display";text-transform:uppercase;min-height:1.1em;margin-top:12px}
+/* línea de tiempo: filtros */
+.filters{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px}
+.tl.only-sup .lane:not(.l-sup),.tl.only-con .lane:not(.l-con),.tl.only-bau .lane:not(.l-bau){opacity:.2}
+.evbox .who{font:600 12px "IBM Plex Mono";color:var(--red);display:block;margin-bottom:4px}
+.ctl button{white-space:nowrap}
+@media(max-width:700px){nav.dots{display:none}.ctl .where{font-size:11px}.ctl button{padding:0 12px}#tapa .cap{display:none}
+ .trio .cell span{font-size:10px;padding:6px;height:auto}.trio .cell svg{height:calc(100% - 40px)}.vert{display:none}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+#tapa .f2{top:11%!important;right:24%!important}
+#tapa .f4{top:40%!important;right:13%!important}
+.wipe .lay{padding:0}.wipe .lay img{width:100%;height:100%;max-width:none;max-height:none;object-fit:cover}
+.s-sup .intro figcaption,.intro.s-sup figcaption{position:relative;z-index:2;background:light-dark(#f5f2ea,#0f0e0d)}
+@media(max-width:700px){
+ footer.ctl .where{display:none}
+ .s-con .works{transform:none}.s-con .work:nth-child(odd){margin-top:0}
+ .s-con .work:hover{transform:none;box-shadow:none}
+ #obras-2>.wrap{padding-top:34px}
+ #tapa .f3{top:24%!important;right:8%!important}
+ #tapa .f4{top:34%!important}
+ #tapa .cyr{font-size:9px;letter-spacing:.08em}
+ .wipe .lab{font-size:10px;padding:3px 6px}
+ .wipe .lab[style*="right"]{bottom:auto;top:10px}
+}
+.work figure{overflow:hidden}.work figure img{max-height:clamp(180px,22vw,280px);width:auto;height:auto}
+.wipe{max-width:760px;height:clamp(300px,46vw,540px)}
+@media(max-width:700px){.s-sup .work:nth-child(odd){transform:rotate(-1.5deg)}.s-sup .work:nth-child(even){transform:rotate(1.5deg)}}
+.dlg .box{overflow:hidden}.dlg .box img{max-height:clamp(180px,24vw,300px);width:auto;height:auto;max-width:100%}
+.dlg figcaption{position:relative;z-index:1}
+.s-sup .work figure{height:clamp(300px,36vw,520px)}
+.s-sup .work figure img{width:100%;height:100%;max-width:none;max-height:none;object-fit:cover;object-position:center}
+.s-sup .work figure img[src*="cuadrado-rojo"]{object-position:center 28%}.s-sup .work figure img[src*="cuadrado-negro"]{object-position:center 45%}
+.s-sup .work figure img[src*="composicion-1916"]{object-position:center 45%}
+</style>
+</head>
+<body>
+<div class="bar" id="bar"></div>
+<header>
+  <button class="brand" data-go="tapa"><b></b>Diálogos vanguardistas</button>
+  <nav class="dots" id="dots" aria-label="Pantallas"></nav>
+</header>
+
+<main id="main">
+
+<!-- 1 TAPA -->
+<section class="scr" id="tapa" data-t="Tapa">
+  <div class="photo" role="img" aria-label="Fotografía de la Última exposición futurista de pinturas 0,10, Petrogrado, 1915"></div>
+  <span class="cyr">ДИАЛОГИ АВАНГАРДА · DIALOGE DER AVANTGARDE</span>
+  <i class="sq f1" data-d="18"></i><i class="sq f2" data-d="34"></i><i class="sq f3" data-d="26"></i><i class="sq f4" data-d="12"></i>
+  <div class="in">
+    <p class="kick" style="color:var(--yel)">Museo de Arte Moderno Digital · Exposición virtual</p>
+    <h1><span>Diálogos</span><span>vanguardistas</span></h1>
+    <p class="names">Kazimir Malévich · El Lissitzky · Vladímir Tatlin · Aleksandr Ródchenko · Vasili Kandinsky · Gunta Stölzl · Marianne Brandt · László Moholy-Nagy · Joost Schmidt</p>
+    <p class="names" style="color:var(--yel)">■ Suprematismo × ▲ Constructivismo ruso × ● Bauhaus · 1915–1933</p>
+    <button class="enter" data-go="recorrido">Entrar a la muestra ▶</button>
+  </div>
+  <span class="cap">Fondo: Última exposición futurista 0,10, Petrogrado, 1915</span>
+</section>
+
+<!-- 2 RECORRIDO -->
+<section class="scr" id="recorrido" data-t="Recorrido">
+  <div class="wrap">
+    <p class="kick">Cómo recorrer la muestra</p>
+    <h2>Recorrido</h2>
+    <p class="lead">Avanzá con las flechas del teclado, los botones de abajo o este índice. En cada obra, los botones ▲ ■ ● despliegan la ficha técnica, las búsquedas y cómo lo resuelve; también aparecen al pasar el mouse.</p>
+    <ul class="toc" id="toc"></ul>
+  </div>
+</section>
+
+<!-- 3 ENSAYO -->
+<section class="scr" id="ensayo" data-t="Ensayo curatorial">
+  <div class="wrap two">
+    <div>
+      <p class="kick">Ensayo curatorial</p>
+      <h2>Por qué cruzar estas tres vanguardias</h2>
+    </div>
+    <div class="ensayo-txt"><p>El Suprematismo, el Constructivismo ruso y la Bauhaus comparten la ruptura radical con el ilusionismo figurativo y el rechazo a la ornamentación del siglo XIX. Las tres vanguardias adoptaron las formas geométricas primarias y los colores puros como un vocabulario plástico universal, buscando construir un nuevo orden estético alineado con las transformaciones de la sociedad moderna.</p><p>El diálogo entre ellas refleja una fascinante trayectoria conceptual: la geometría nació como indagación contemplativa de la pura sensibilidad con Kasimir Malévich, se transformó en herramienta de propaganda e ingeniería social tras la Revolución Rusa y fue sistematizada racionalmente en el modelo pedagógico de la Bauhaus. A través de figuras fundamentales como El Lissitzky, Wassily Kandinsky y László Moholy-Nagy, las reflexiones abstractas soviéticas se integraron de manera directa al funcionalismo industrial alemán.</p><p>Esta confluencia histórica sentó las bases del diseño gráfico moderno como disciplina profesional rigurosa. Al abandonar la improvisación artesanal, estas vanguardias introdujeron la maquetación en grillas asimétricas, el uso normativo de tipografías sans-serif, la integración de la fotografía y la concepción de la pieza gráfica como un mensaje claro y funcional proyectado para la reproducción masiva.</p></div>
+  </div>
+</section>
+
+<!-- 4 CÓDIGOS -->
+<section class="scr" id="codigos" data-t="Un catálogo con sus códigos">
+  <div class="wrap">
+    <p class="kick">Decisiones de diseño</p>
+    <h2>Un catálogo hecho con sus códigos</h2>
+    <div class="codes">
+      <div class="code"><h3>Color</h3><div class="sw"><span style="background:#1b1a17">negro</span><span style="background:#b3262e">rojo</span><span style="background:#e0b11e;color:#1b1a17">amar.</span><span style="background:#1f4e9c">azul</span><span style="background:#e9e1cf;color:#1b1a17;border:1px solid #b9af9c">lienzo</span></div><p class="mono">Negro y rojo de Malévich y del afiche soviético; los primarios de la Bauhaus; fondo de lienzo crudo.</p></div>
+      <div class="code"><h3>Tipografía</h3><p style="font:900 34px/1 'Big Shoulders Display';text-transform:uppercase;margin:4px 0">Condensada de cartel</p><p style="margin:4px 0">Instrument Sans para leer.</p><p class="mono">IBM Plex Mono para fichas y rótulos.</p></div>
+      <div class="code"><h3>Forma y navegación</h3><div class="shapes"><i class="tri"></i><i class="squ"></i><i class="cir"></i></div><p class="mono">▲ ficha · ■ búsquedas · ● cómo lo resuelve. Las tres formas del cuestionario forma-color de Kandinsky (1923) funcionan como botones.</p></div>
+      <div class="code"><h3>Grilla y movimiento</h3><p class="mono">Sala I: las obras flotan sin grilla. Sala II: todo entra en diagonal. Sala III: retícula ortogonal y aparición por pasos.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- SALAS (se completan desde los datos) -->
+<section class="scr intro s-sup" id="sala-1" data-t="Sala I · Suprematismo" data-mov="sup"></section>
+<section class="scr s-sup" id="obras-1" data-t="Suprematismo · Obras" data-mov="sup"></section>
+<section class="scr intro s-con" id="sala-2" data-t="Sala II · Constructivismo ruso" data-mov="con"></section>
+<section class="scr s-con" id="obras-2" data-t="Constructivismo · Obras" data-mov="con"></section>
+<section class="scr intro s-bau" id="sala-3" data-t="Sala III · Bauhaus" data-mov="bau"></section>
+<section class="scr s-bau" id="obras-3" data-t="Bauhaus · Obras" data-mov="bau"></section>
+
+<!-- PUENTES -->
+<section class="scr" id="puentes" data-t="Puentes">
+  <div class="wrap two">
+    <div>
+      <p class="kick">Entre las salas</p>
+      <h2>Puentes</h2>
+      <figure style="margin:18px 0 0;max-width:420px"><img src="img/lissitzky-proun-19d.jpg" alt="El Lissitzky, Proun 19D, 1920–21" loading="lazy" style="width:100%;display:block"><figcaption class="mono" style="margin-top:8px">El Lissitzky · Proun 19D · 1920–21 · MoMA, Nueva York</figcaption></figure>
+      
+    </div>
+    <p class="lead">Las ideas abstractas suprematistas evolucionaron hacia el diseño utilitario cuando Malévich y El Lissitzky impulsaron el colectivo UNOVIS en Vítebsk, aplicando la geometría a la propaganda política. Este lenguaje viajó a la Bauhaus mediante El Lissitzky, pionero de la maquetación asimétrica en rojo y negro, y por Wassily Kandinsky. Finalmente, el artista húngaro László Moholy-Nagy consolidó la impronta constructivista en la pedagogía alemana articulando tipografía y fotografía.</p>
+  </div>
+</section>
+
+<!-- DIÁLOGO I -->
+<section class="scr" id="dialogo-1" data-t="Diálogo I · Un cuadrado, tres idiomas">
+  <div class="wrap">
+    <p class="kick">Diálogo I · elegí cómo mirar</p><h2>Un cuadrado, tres idiomas</h2>
+    <div class="modes" id="m1" role="group" aria-label="Modo de diálogo">
+      <button data-m="cmp" aria-pressed="true">■ Comparar</button><button data-m="rel" aria-pressed="false">▲ Relacionar</button><button data-m="fus" aria-pressed="false">● Fusionar</button>
+    </div>
+    <div class="trio" id="trio">
+      <div class="cell"><svg viewBox="0 0 400 400" role="img" aria-label="Código suprematista: cuadrado negro que flota girado en el vacío"><rect class="key" x="105" y="85" width="180" height="180" transform="rotate(-8 195 175)"/><rect x="115" y="95" width="160" height="160" transform="rotate(-8 195 175)" style="fill:var(--ink)"/><rect x="50" y="300" width="210" height="16" transform="rotate(-20 155 308)" style="fill:var(--red)"/><rect x="290" y="70" width="46" height="14" transform="rotate(30 313 77)" style="fill:var(--yel)"/></svg><span>■ Suprematismo · flota</span></div>
+      <div class="cell"><svg viewBox="0 0 400 400" role="img" aria-label="Código constructivista: cuadrado atravesado por una cuña roja y una diagonal negra"><rect class="key" x="110" y="100" width="180" height="180"/><rect x="120" y="110" width="160" height="160" style="fill:var(--ink)"/><polygon points="390,110 390,270 170,190" style="fill:var(--red)"/><rect x="10" y="330" width="380" height="22" transform="rotate(-24 200 341)" style="fill:var(--ink)"/></svg><span>▲ Constructivismo · empuja</span></div>
+      <div class="cell"><svg viewBox="0 0 400 400" role="img" aria-label="Código Bauhaus: cuadrado rojo en una retícula con triángulo amarillo y círculo azul"><g style="stroke:var(--line)" stroke-width="1"><path d="M0 100H400M0 200H400M0 300H400M100 0V400M200 0V400M300 0V400"/></g><rect class="key" x="120" y="110" width="160" height="160"/><rect x="130" y="120" width="140" height="140" style="fill:var(--red)"/><polygon points="40,340 100,240 160,340" style="fill:var(--yel)"/><circle cx="310" cy="300" r="50" style="fill:var(--blu)"/></svg><span>● Bauhaus · ordena</span></div>
+    </div>
+    <p class="fusenote" id="fn1" aria-live="polite">Comparar: la misma figura, el cuadrado, tratada con tres códigos distintos.</p>
+    <div class="dlg" id="d1"></div>
+    <p class="dlg-txt">Las tres vanguardias adoptaron la geometría elemental como un código plástico universal para romper con el historicismo figurativo. Sin embargo, se distanciaron en sus propósitos: el Suprematismo la utilizó para la contemplación metafísica de la pura sensibilidad; el Constructivismo la transformó en una herramienta utilitaria de agitación política y producción industrial; y la Bauhaus la sistematizó racionalmente para el diseño de objetos cotidianos y piezas de comunicación visual.</p>
+  </div>
+</section>
+
+<!-- DIÁLOGO II -->
+<section class="scr" id="dialogo-2" data-t="Diálogo II · Arte puro / arte útil">
+  <div class="wrap">
+    <p class="kick">Diálogo II · arrastrá el control</p><h2>Arte puro / arte útil</h2>
+    <div class="wipe" id="w2"></div>
+    <p class="dlg-txt">En Blanco sobre blanco, la geometría constituye una indagación pictórica pura enfocada en la contemplación de la sensibilidad abstracta, sin finalidad práctica alguna. En cambio, en el infusor de té MT 49 de Marianne Brandt, las formas primarias abandonan el lienzo para convertirse en un objeto utilitario tridimensional. La Bauhaus transforma la geometría en la estructura funcional de un producto industrial, aplicando la máxima de que la forma sigue a la función.</p>
+  </div>
+</section>
+
+<!-- DIÁLOGO III -->
+<section class="scr" id="dialogo-3" data-t="Diálogo III · La palabra como imagen">
+  <div class="wrap">
+    <p class="kick">Diálogo III · escribí una palabra</p><h2>La palabra como imagen</h2>
+    <div class="typo">
+      <div class="tstage" id="ts" aria-live="polite"><i class="t-con-bg"></i><i class="t-con-bar"></i><div class="w" id="tw"></div></div>
+      <div class="tside">
+        <label for="tin">Tu palabra</label><input id="tin" value="Diálogo" maxlength="12" autocomplete="off">
+        <div class="modes" id="m3" role="group" aria-label="Código tipográfico">
+          <button data-c="sup" aria-pressed="false">■ Suprematismo · letras que flotan</button>
+          <button data-c="con" aria-pressed="true">▲ Constructivismo · grito en diagonal</button>
+          <button data-c="bau" aria-pressed="false">● Bauhaus · minúscula universal</button>
+          <button data-c="fus" aria-pressed="false">Fusionar las tres</button>
+        </div>
+      </div>
+    </div>
+    <div class="dlg" id="d3"></div>
+    <p class="dlg-txt">El Constructivismo y la Bauhaus convirtieron la tipografía y la fotografía en un lenguaje gráfico común, adoptando composiciones asimétricas, fuentes de palo seco y bloques en rojo y negro. Mientras los constructivistas utilizaron el fotomontaje dinámico para crear carteles de agitación masiva, la Bauhaus aplicó la fototipografía al diseño editorial y a la publicidad. Inspirado por El Lissitzky, el tipógrafo Jan Tschichold sistematizó luego estos principios bajo el concepto de tipografía elemental.</p>
+  </div>
+</section>
+
+<!-- LÍNEA DE TIEMPO -->
+<section class="scr" id="tiempo" data-t="Línea de tiempo">
+  <div class="wrap">
+    <p class="kick">Tocá cada marca</p><h2>Línea de tiempo 1915–1933</h2>
+    <div class="filters modes" id="tf"><button data-f="" aria-pressed="true">Todas</button><button data-f="sup" aria-pressed="false">■ Suprematismo</button><button data-f="con" aria-pressed="false">▲ Constructivismo</button><button data-f="bau" aria-pressed="false">● Bauhaus</button></div>
+    <div class="tl" id="tl"></div>
+    <div class="evbox" id="evbox" aria-live="polite"></div>
+  </div>
+</section>
+
+<!-- CIERRE -->
+<section class="scr" id="cierre" data-t="Cierre">
+  <div class="wrap">
+    <p class="kick">Cierre</p><h2>De la forma pura a la forma útil</h2>
+    <div class="cierre" style="margin-top:22px">
+      <div class="gif"><img src="img/bucle.gif" alt="Bucle animado que desarma y rearma el cuadrado, la cuña y el círculo de las tres vanguardias"></div>
+      <div>
+        <div class="stage" id="stage"><i class="a"></i><i class="b"></i><i class="c"></i><i class="d"></i></div>
+        <button class="big" id="dec">Deconstruir</button>
+        <p class="mono" style="margin-top:10px">El cuadrado (Malévich), la cuña (Lissitzky), el círculo y el triángulo (Bauhaus) se separan y se vuelven a encontrar.</p>
+      </div>
+    </div>
+    <h3 style="margin-top:34px">Manifiesto sonoro</h3>
+    <p class="mono" style="color:var(--soft)">Cada forma tiene su sonido. Tocalas o componé el manifiesto completo.</p>
+    <div class="pads" id="pads">
+      <button class="pad" data-s="0" aria-label="Cuadrado"><i class="pq"></i><small>■ cuadrado</small></button>
+      <button class="pad" data-s="1" aria-label="Cuña"><i class="pw"></i><small>▲ cuña</small></button>
+      <button class="pad" data-s="2" aria-label="Triángulo"><i class="pt"></i><small>▲ triángulo</small></button>
+      <button class="pad" data-s="3" aria-label="Círculo"><i class="pc"></i><small>● círculo</small></button>
+    </div>
+    <button class="big" id="compose">▶ Componer el manifiesto</button>
+    <p class="manif" id="manif" aria-live="polite"></p>
+  </div>
+</section>
+
+<!-- CRÉDITOS -->
+<section class="scr" id="creditos" data-t="Créditos">
+  <div class="wrap">
+    <p class="kick">Créditos digitales</p><h2>Créditos</h2>
+    <div class="cred">
+      <div><h3>Diseño y curaduría</h3><p>Renata Simone y Federico Ignacio Soliz Espinosa<br>Historia del Diseño · 2.º año · Tecnicatura en Diseño Gráfico · 2026<br>Prof. Agostina Russo</p></div>
+      <div><h3>Bibliografía</h3><ul class="biblio"><li>Accenture. (s. f.). <i>Fundamentos del diseño gráfico: 1. Historia del diseño gráfico</i>. Accenture.</li><li>Alcaide, C. (1997). El arte concreto en Argentina: Invencionismo, Madí, Perceptismo. <i>Arte, Individuo y Sociedad</i>, (9).</li><li>Cátedra de Historia del Diseño. (2026). <i>Constructivismo</i> [Video]. Instituto Superior de Arte y Creatividad de Pilar. Google Classroom.</li><li>Cátedra de Historia del Diseño. (2026, 9 de octubre). <i>Bauhaus</i> [Video de clase asincrónica]. Instituto Superior de Arte y Creatividad de Pilar. Google Classroom.</li><li>Dubrovsky, L. (2018). <i>Movimientos artísticos 1900-1950: Vanguardias históricas</i>. Universidad de Flores.</li><li>Satué, E. (1988). <i>El diseño gráfico: Desde los orígenes hasta nuestros días</i>. Alianza Editorial.</li><li>Taranilla de la Varga, C. J. (2014). <i>Breve historia del arte</i>. Ediciones Nowtilus.</li><li>Universidad SUDS. (s. f.). <i>Historia del diseño gráfico</i> [Material de lectura].</li></ul></div>
+      <div><h3>Obras reproducidas</h3><ul id="imgcred"></ul></div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="ctl">
+  <button id="prev" aria-label="Pantalla anterior">◀ Anterior</button>
+  <span class="where" id="where"></span>
+  <button id="next" aria-label="Pantalla siguiente">Siguiente ▶</button>
+</footer>
+
+<script>
+{
+/* ===== DATOS: editar acá ===== */
+const SALAS={
+ sup:{n:"Sala I",t:"Suprematismo",meta:"Rusia · desde 1915 · Kazimir Malévich",hero:"malevich-exposicion-1920.jpg",heroAlt:"Obras de Kazimir Malévich en una exposición, c. 1920 (fotografía de época)"},
+ con:{n:"Sala II",t:"Constructivismo ruso",meta:"Rusia · 1917–1932 · Tatlin · Ródchenko · Lissitzky",hero:"lissitzky-cuna-roja.jpg",heroAlt:"El Lissitzky, Golpead a los blancos con la cuña roja, 1919–20"},
+ bau:{n:"Sala III",t:"Bauhaus",meta:"Alemania · 1919–1933 · Weimar · Dessau · Berlín",hero:"kandinsky-composicion-viii.jpg",heroAlt:"Vasili Kandinsky, Composición VIII, 1923"}
+};
+const TXT_SALA={"sup": "El Suprematismo fue el primer movimiento de abstracción geométrica pura, fundado en Rusia por Kasimir Malévich entre 1913 y 1915. Surgió para erradicar la representación figurativa del objeto y la imitación de la naturaleza, buscando ingresar al campo de la pura sensibilidad desvinculada de la realidad fenoménica. Con este fin, redujo el lenguaje pictórico a formas geométricas elementales suspendidas libremente sobre planos neutros e ilimitados.", "con": "El Constructivismo surgió en Rusia alrededor de 1914 y cobró fuerza con la Revolución rusa de 1917. Sus artistas rechazaron el arte por el arte para ponerlo al servicio de una nueva sociedad. A través de la experimentación, la geometría y la comunicación visual, buscaron integrar el arte con el diseño industrial y las artes aplicadas, contribuyendo al desarrollo de un nuevo lenguaje visual.", "bau": "La Bauhaus fue una escuela de arte, diseño y arquitectura fundada por Walter Gropius en Alemania en 1919. Buscaba eliminar las diferencias entre las bellas artes y las artes aplicadas, integrando el arte, la artesanía y la tecnología. A través de la simplicidad y la funcionalidad, estableció una estrecha relación entre el arte y la vida cotidiana, sentando las bases del diseño moderno."};
+const TXT_OBRA={"lissitzky-cuna-roja.jpg": ["Transmitir los ideales revolucionarios mediante un lenguaje visual abstracto, utilizando el diseño gráfico como herramienta de comunicación política y social.", "Utiliza una cuña roja que penetra en un círculo blanco, simbolizando el enfrentamiento entre las fuerzas revolucionarias y sus opositores. Las diagonales, las formas geométricas y los contrastes cromáticos generan tensión y dinamismo."], "tatlin-monumento.jpg": ["Representar los ideales de la Revolución rusa mediante la integración del arte, la arquitectura y la tecnología, simbolizando la construcción de una nueva sociedad.", "Proyecta una estructura de hierro y vidrio compuesta por espirales, diagonales y volúmenes geométricos que transmiten movimiento, progreso y modernidad."], "rodchenko-gosizdat.jpg": ["Promover la lectura y el acceso al conocimiento, utilizando la comunicación visual como herramienta de transformación social.", "Combina fotografía, formas geométricas, contrastes cromáticos y tipografía de gran peso visual. La disposición triangular del texto representa la expansión de la voz, reforzando el mensaje."], "rodchenko-pro-eto.jpg": ["Experimentar con nuevas formas de comunicación visual, rompiendo con el diseño editorial tradicional y estableciendo una relación entre la imagen y el contenido literario.", "Utiliza el fotomontaje, la fragmentación de imágenes, los contrastes visuales y una composición asimétrica, integrando la fotografía y la tipografía en una misma construcción gráfica."], "stolzl-tapiz.jpg": ["Integrar el arte con el diseño textil, explorando las posibilidades expresivas de los colores, las formas y los materiales mediante la experimentación artesanal.", "Emplea formas geométricas, contrastes cromáticos, repetición de elementos y diferentes texturas. A través del tejido, construye una composición abstracta con ritmo visual."], "brandt-mt49.jpg": ["Integrar la estética y la funcionalidad en un objeto de uso cotidiano, estableciendo una relación entre el arte, la tecnología y el diseño industrial.", "Utiliza formas geométricas simples y materiales como el metal y el ébano. Elimina la ornamentación innecesaria y organiza cada elemento de acuerdo con su función."], "moholy-bauhausbucher12.jpg": ["Renovar el diseño editorial mediante un lenguaje visual moderno, integrando la tipografía y los elementos gráficos para lograr una comunicación unificada.", "Emplea tipografías sans serif, formas geométricas, contrastes visuales y una composición asimétrica, priorizando la claridad comunicativa y la simplicidad."], "schmidt-cartel-1923.jpg": ["Difundir la exposición de la Bauhaus mediante una propuesta gráfica que refleje los principios de modernidad, abstracción y experimentación de la escuela.", "Combina círculos, líneas, figuras geométricas y tipografías sans serif. Utiliza contrastes cromáticos y una composición diagonal que integra texto e imagen, generando dinamismo y unidad visual."], "malevich-cuadrado-negro.jpg": ["Malévich pretendía romper radicalmente con la tradición figurativa académica, fijando un punto cero en la pintura donde el objeto desapareciera para dar paso a la abstracción absoluta.", "Sitúa un único cuadrado negro plano en posición central sobre un lienzo blanco, aboliendo toda ilusión de profundidad, perspectiva o representación del mundo real."], "malevich-cuadrado-rojo.jpg": ["Buscó incorporar la energía del color y la tensión espacial dentro del lenguaje abstracto, transformando la forma geométrica en un vehículo de vitalidad espiritual.", "Emplea un cuadrilátero rojo ligeramente asimétrico e inclinado sobre fondo neutro, produciendo una vibración visual que dinamiza el espacio pictórico."], "malevich-composicion-1916.jpg": ["Intentó plasmar la sensación de movimiento no figurativo y el ritmo dinámico en un universo liberado de la gravedad y de referencias objetuales.", "Organiza cuadriláteros y polígonos de diversos colores sobre ejes diagonales, haciéndolos flotar armónicamente sobre un fondo blanco ilimitado."], "malevich-blanco-sobre-blanco.jpg": ["Persiguió la depuración extrema del arte mediante la supresión del contraste cromático, disolviendo la forma en el infinito de la pura sensibilidad.", "Superpone un cuadrado blanco sutilmente inclinado sobre una superficie del mismo tono, diferenciando las figuras únicamente mediante variaciones de textura y matiz."]};
+const OBRAS={
+ sup:[
+  {img:"malevich-cuadrado-negro.jpg",a:"Kazimir Malévich",t:"Cuadrado negro",y:"1915",tec:"Óleo sobre lino",med:"79,5 × 79,5 cm",col:"Galería Tretiakov, Moscú"},
+  {img:"malevich-cuadrado-rojo.jpg",a:"Kazimir Malévich",t:"Cuadrado rojo (Realismo pictórico de una campesina en dos dimensiones)",y:"1915",tec:"Óleo sobre lienzo",med:"53 × 53 cm",col:"Museo Estatal Ruso, San Petersburgo"},
+  {img:"malevich-composicion-1916.jpg",a:"Kazimir Malévich",t:"Composición suprematista",y:"1916",tec:"Óleo sobre lienzo",med:"88,5 × 71 cm",col:"Colección privada"},
+  {img:"malevich-blanco-sobre-blanco.jpg",a:"Kazimir Malévich",t:"Composición suprematista: blanco sobre blanco",y:"1918",tec:"Óleo sobre lienzo",med:"79,4 × 79,4 cm",col:"MoMA, Nueva York"}],
+ con:[
+  {img:"lissitzky-cuna-roja.jpg",a:"El Lissitzky",t:"Golpead a los blancos con la cuña roja",y:"1919–20",tec:"Litografía (cartel)",med:"—",col:"—"},
+  {img:"tatlin-monumento.jpg",a:"Vladímir Tatlin",t:"Monumento a la III Internacional (maqueta)",y:"1919–20",tec:"Maqueta en madera y metal; proyecto no construido",med:"—",col:"Reproducción fotográfica de época"},
+  {img:"rodchenko-gosizdat.jpg",a:"Aleksandr Ródchenko",t:"Cartel «Libros» para la editorial Lengiz",y:"1924",tec:"Fotomontaje y litografía",med:"—",col:"—"},
+  {img:"rodchenko-pro-eto.jpg",a:"Aleksandr Ródchenko",t:"Pro Eto (Sobre esto), de V. Maiakovski: fotomontaje interior",y:"1923",tec:"Fotomontaje, impresión tipográfica",med:"23,2 × 15,3 cm (libro)",col:"MoMA, Nueva York"}],
+ bau:[
+  {img:"stolzl-tapiz.jpg",a:"Gunta Stölzl",t:"Tapiz Rojo-Verde (Schlitzgobelin)",y:"1927–28",tec:"Gobelino ranurado, tejido a mano",med:"—",col:"Bauhaus-Archiv, Berlín"},
+  {img:"brandt-mt49.jpg",a:"Marianne Brandt",t:"Infusor de té MT 49",y:"1924",tec:"Latón y ébano · Taller de metal",med:"—",col:"Bauhaus-Archiv, Berlín"},
+  {img:"moholy-bauhausbucher12.jpg",a:"László Moholy-Nagy",t:"Sobrecubierta de Bauhausbücher 12 (W. Gropius, Bauhausbauten Dessau)",y:"1930",tec:"Impresión tipográfica · Albert Langen Verlag, Múnich",med:"—",col:"—"},
+  {img:"schmidt-cartel-1923.jpg",a:"Joost Schmidt",t:"Cartel de la Exposición de la Bauhaus, Weimar",y:"1923",tec:"Litografía",med:"66,7 × 47,3 cm",col:"MoMA, Nueva York"}]
+};
+const EVENTOS=[
+ {l:"sup",y:1915,t:"Malévich presenta el Cuadrado negro en la Última exposición futurista 0,10, en Petrogrado, y publica «Del cubismo y el futurismo al suprematismo»."},
+ {l:"ctx",y:1917,t:"Revolución de Octubre. El arte nuevo busca un lugar en la sociedad soviética."},
+ {l:"sup",y:1918,t:"Blanco sobre blanco: el límite del color en la pintura de Malévich."},
+ {l:"bau",y:1919,t:"Walter Gropius funda la Bauhaus en Weimar."},
+ {l:"con",y:1920,t:"Tatlin presenta la maqueta del Monumento a la III Internacional. En Vítebsk, Malévich y Lissitzky forman el grupo UNOVIS."},
+ {l:"con",y:1921,t:"Exposición 5×5=25 en Moscú: los constructivistas proclaman el pase de la pintura a la producción."},
+ {l:"con",y:1922,t:"Primera Exposición de Arte Ruso en Berlín; Lissitzky actúa de puente con Occidente. Kandinsky se suma a la Bauhaus."},
+ {l:"bau",y:1923,t:"Gran exposición de la Bauhaus en Weimar (cartel de Joost Schmidt). Moholy-Nagy entra a la escuela. Ródchenko hace la tapa de Pro Eto."},
+ {l:"bau",y:1925,t:"La Bauhaus se traslada a Dessau."},
+ {l:"bau",y:1928,t:"Gropius deja la dirección; lo reemplaza Hannes Meyer."},
+ {l:"ctx",y:1932,t:"Un decreto soviético disuelve las agrupaciones artísticas independientes. La Bauhaus se muda a Berlín."},
+ {l:"bau",y:1933,t:"La Bauhaus cierra bajo la presión del nazismo."}];
+const Y0=1913,Y1=1935;
+
+/* ===== helpers ===== */
+const $=s=>document.querySelector(s),esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const pic=(f,alt,a,t)=>`<img src="img/${esc(f)}" alt="${esc(alt)}" loading="lazy" onerror="this.outerHTML='<div class=ph><strong>${esc(t).replace(/'/g,"")}</strong>${esc(a)}<br>imagen pendiente</div>'">`;
+const lbl={sup:"■",con:"▲",bau:"●"};
+
+/* ===== salas ===== */
+let k=1;
+for(const m of ["sup","con","bau"]){
+ const S=SALAS[m],intro=$("#sala-"+k),obras=$("#obras-"+k);
+ const deco=m==="sup"?'<i class="deco"></i><i class="beam"></i><i class="dot"></i><span class="cyr vert">СУПРЕМАТИЗМ · 0,10 · 1915</span>':m==="con"?'<span class="cyr vert">КОНСТРУКТИВИЗМ · 1921</span>':'<span class="cyr vert">STAATLICHES BAUHAUS · WEIMAR 1919</span><span class="blocks" aria-hidden="true"><i class="tri"></i><i class="squ"></i><i class="cir"></i></span>';
+ intro.innerHTML=`${deco}<div class="wrap"><div class="sala-head"><h2 class="${m==="bau"?"lower":""}">${m==="bau"?"bauhaus":S.t}</h2></div>${m==="bau"?'<div class="rule"></div>':""}
+ <div class="two"><figure style="margin:0">${pic(S.hero,S.heroAlt,"",S.heroAlt)}<figcaption class="mono" style="margin-top:8px">${esc(S.heroAlt)}</figcaption></figure>
+ <div><p class="kick">${S.n} · ${esc(S.meta)}</p>${m==="con"?'<div class="wedge"></div>':""}
+ ${TXT_SALA[m]?`<p class="sala-txt">${esc(TXT_SALA[m])}</p>`:'<div class="slot"><b>■ Búsquedas y características · texto de autoría</b>Qué buscó el movimiento y cuáles son sus rasgos generales, con sus palabras.</div>'}
+ ${m==="bau"?'<div class="legend"><span class="shapes"><i class="tri"></i><i class="squ"></i><i class="cir"></i></span>Amarillo-triángulo, rojo-cuadrado, azul-círculo: cuestionario de Kandinsky, 1923</div>':""}</div></div></div>`;
+ obras.innerHTML=`${m==="con"?'<i class="band" style="height:90px"></i>':""}<div class="wrap"><div class="sala-head"><h2 style="font-size:clamp(36px,5vw,72px)">${S.t} · obras</h2><span class="mono">Tocá ▲ ■ ● o pasá el mouse</span></div>${m==="bau"?'<div class="rule"></div>':""}
+ <div class="works">${OBRAS[m].map((o,i)=>{const id=m+i;return `<article class="work">
+  <figure>${pic(o.img,`${o.a}, ${o.t}, ${o.y}`,o.a,o.t)}</figure>
+  <div class="panel f0" id="p-${id}-0" role="region" aria-label="Ficha técnica"><h4>▲ Ficha técnica</h4><dl><dt>Autor</dt><dd>${esc(o.a)}</dd><dt>Obra</dt><dd>${esc(o.t)}</dd><dt>Año</dt><dd>${esc(o.y)}</dd><dt>Técnica</dt><dd>${esc(o.tec)}</dd><dt>Medidas</dt><dd>${esc(o.med)}</dd><dt>Colección</dt><dd>${esc(o.col)}</dd></dl></div>
+  <div class="panel" id="p-${id}-1" role="region" aria-label="Búsquedas"><h4>■ Búsquedas y características</h4>${TXT_OBRA[o.img]?`<p>${esc(TXT_OBRA[o.img][0])}</p>`:'<div class="slot"><b>Texto de autoría</b>Qué buscaba esta obra dentro del movimiento.</div>'}</div>
+  <div class="panel" id="p-${id}-2" role="region" aria-label="Cómo lo resuelve"><h4>● Cómo lo resuelve</h4>${TXT_OBRA[o.img]?`<p>${esc(TXT_OBRA[o.img][1])}</p>`:'<div class="slot"><b>Texto de autoría</b>Cómo lo resuelve visualmente: forma, color, composición, técnica.</div>'}</div>
+  <p class="cap">${esc(o.a)} · ${esc(o.t)} · ${esc(o.y)}</p>
+  <div class="btns">${["▲ Ficha","■ Búsquedas","● Cómo lo resuelve"].map((b,j)=>`<button aria-pressed="false" aria-controls="p-${id}-${j}" data-p="p-${id}-${j}">${b}</button>`).join("")}</div>
+ </article>`}).join("")}</div></div>`;
+ k++;
+}
+document.addEventListener("click",e=>{
+ const b=e.target.closest("[data-p]");if(!b)return;
+ const card=b.closest(".work"),open=b.getAttribute("aria-pressed")!=="true";
+ card.querySelectorAll("[data-p]").forEach(x=>x.setAttribute("aria-pressed","false"));
+ card.querySelectorAll(".panel").forEach(p=>p.classList.remove("show"));
+ if(open){b.setAttribute("aria-pressed","true");document.getElementById(b.dataset.p).classList.add("show")}
+});
+
+/* ===== diálogos ===== */
+const all=[].concat(...Object.values(OBRAS)),find=f=>all.find(o=>o.img===f);
+const dlg=(sel,items)=>{$(sel).innerHTML=items.map(([f,tags])=>{const o=find(f);return `<figure><div class="box">${pic(o.img,`${o.a}, ${o.t}`,o.a,o.t)}</div><figcaption>${esc(o.a)} · ${esc(o.t)} · ${esc(o.y)}</figcaption>${tags.map(t=>`<span class="tag">${esc(t)}</span>`).join("")}</figure>`}).join("")};
+dlg("#d1",[["malevich-cuadrado-negro.jpg",["■ cuadrado","negro / blanco","Sala I"]],["lissitzky-cuna-roja.jpg",["▲ cuña","rojo / blanco / negro","Sala II"]],["schmidt-cartel-1923.jpg",["● círculo","rojo / negro / amarillo","Sala III"]]]);
+dlg("#d3",[["rodchenko-pro-eto.jpg",["fotomontaje","1923"]],["schmidt-cartel-1923.jpg",["tipografía geométrica","1923"]],["moholy-bauhausbucher12.jpg",["nueva tipografía","1930"]]]);
+{const a=find("malevich-blanco-sobre-blanco.jpg"),b=find("brandt-mt49.jpg");
+ $("#w2").innerHTML=`<div class="lay">${pic(a.img,`${a.a}, ${a.t}`,a.a,a.t)}</div><div class="lay top">${pic(b.img,`${b.a}, ${b.t}`,b.a,b.t)}</div><span class="lab" style="left:10px">Malévich · 1918 · arte puro</span><span class="lab" style="right:10px">Brandt · 1924 · arte útil</span><i class="knob"></i><input type="range" min="0" max="100" value="50" aria-label="Comparar las dos obras">`;
+ $("#w2 input").addEventListener("input",e=>$("#w2").style.setProperty("--x",e.target.value+"%"));}
+
+/* ===== línea de tiempo ===== */
+{const pos=y=>((y-Y0)/(Y1-Y0)*100)+"%";
+ const lanes=[["sup","Suprematismo",1915,1927],["con","Constructivismo ruso",1917,1932],["bau","Bauhaus",1919,1933],["ctx","Contexto",1917,1932]];
+ let h='<div class="years">';for(let y=1915;y<=1933;y+=2)h+=`<span style="left:${pos(y)}">${y}</span>`;h+="</div>";
+ h+=lanes.map(([c,n,a,b])=>`<div class="lane l-${c}"><span class="name">${n}</span>${c!=="ctx"?`<span class="span" style="left:${pos(a)};width:calc(${pos(b)} - ${pos(a)})"></span>`:""}${EVENTOS.map((e,i)=>e.l===c?`<button class="ev" style="left:${pos(e.y)}" data-e="${i}" aria-pressed="false" aria-label="${e.y}"><i></i></button>`:"").join("")}</div>`).join("");
+ $("#tl").innerHTML=h;
+ const show=i=>{const e=EVENTOS[i];document.querySelectorAll(".ev").forEach(b=>b.setAttribute("aria-pressed",b.dataset.e==i));$("#evbox").innerHTML=`<div class="y">${e.y}</div><p style="margin:0">${esc(e.t)}</p>`};
+ $("#tl").addEventListener("click",e=>{const b=e.target.closest(".ev");if(b)show(+b.dataset.e)});show(0);}
+
+/* ===== tapa: las formas siguen al mouse (paralaje) ===== */
+$("#tapa").addEventListener("pointermove",e=>{const r=e.currentTarget.getBoundingClientRect(),x=(e.clientX-r.left)/r.width-.5,y=(e.clientY-r.top)/r.height-.5;
+ e.currentTarget.querySelectorAll("[data-d]").forEach(f=>f.style.translate=`${x*f.dataset.d}px ${y*f.dataset.d}px`)});
+
+/* ===== diálogo I: comparar · relacionar · fusionar ===== */
+{const notes={cmp:"Comparar: la misma figura, el cuadrado, tratada con tres códigos distintos.",rel:"Relacionar: en rojo, el cuadrado que las tres composiciones comparten.",fus:"Fusionar: las tres composiciones superpuestas en una sola pantalla."};
+ $("#m1").addEventListener("click",e=>{const b=e.target.closest("[data-m]");if(!b)return;
+  $("#m1").querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",x===b));
+  const t=$("#trio");t.classList.toggle("rel",b.dataset.m==="rel");t.classList.toggle("fused",b.dataset.m==="fus");$("#fn1").textContent=notes[b.dataset.m]});}
+
+/* ===== diálogo III: máquina tipográfica ===== */
+{let code="con";const rnd=i=>{const x=Math.sin(i*99.7)*1e4;return x-Math.floor(x)};
+ const draw=()=>{const w=($("#tin").value||"Diálogo").slice(0,12),box=$("#tw"),bg=code==="con"?1:code==="fus"?.55:0;
+  $(".t-con-bg").style.opacity=bg;$(".t-con-bar").style.opacity=bg;
+  box.className="w"+(code==="fus"?"":" t-"+code);
+  box.innerHTML="<div>"+[...w].map((c,i)=>{let cls="",tf="";const k=code==="fus"?["sup","con","bau"][i%3]:code;
+   if(code==="fus")cls="t-"+k;
+   if(k==="sup")tf=`translate(${(rnd(i)-.5)*60}px,${(rnd(i+7)-.5)*90}px) rotate(${(rnd(i+3)-.5)*50}deg)`;
+   if(k==="con")tf=`translateY(${-i*7}px) rotate(-10deg)`;
+   if(k==="bau")c=c.toLowerCase(); else if(k==="con")c=c.toUpperCase();
+   return `<span class="l ${cls}" style="transform:${tf}">${c===" "?"&nbsp;":esc(c)}</span>`}).join("")+"</div>"};
+ $("#m3").addEventListener("click",e=>{const b=e.target.closest("[data-c]");if(!b)return;code=b.dataset.c;$("#m3").querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",x===b));draw()});
+ $("#tin").addEventListener("input",draw);draw();}
+
+/* ===== línea de tiempo: filtros ===== */
+$("#tf").addEventListener("click",e=>{const b=e.target.closest("[data-f]");if(!b)return;$("#tf").querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",x===b));$("#tl").className="tl"+(b.dataset.f?" only-"+b.dataset.f:"")});
+
+/* ===== manifiesto sonoro (mono, con respuesta visual) ===== */
+{let ac=null;const S=[{w:"square",f:220,t:"■ El cuadrado: grado cero · 1915"},{w:"sawtooth",f:330,t:"▲ La cuña: golpe y dirección · 1920"},{w:"triangle",f:440,t:"▲ Triángulo amarillo · Bauhaus 1923"},{w:"sine",f:262,t:"● Círculo azul · Bauhaus 1923"}];
+ const play=i=>{try{ac=ac||new (window.AudioContext||window.webkitAudioContext)();const o=ac.createOscillator(),g=ac.createGain(),n=ac.currentTime;
+  o.type=S[i].w;o.frequency.value=S[i].f;g.gain.setValueAtTime(0,n);g.gain.linearRampToValueAtTime(.18,n+.02);g.gain.exponentialRampToValueAtTime(.001,n+.6);o.connect(g).connect(ac.destination);o.start(n);o.stop(n+.65)}catch(_){}
+  const p=document.querySelector(`.pad[data-s="${i}"]`);p.classList.add("hit");setTimeout(()=>p.classList.remove("hit"),220);$("#manif").textContent=S[i].t};
+ $("#pads").addEventListener("click",e=>{const b=e.target.closest(".pad");if(b)play(+b.dataset.s)});
+ $("#compose").addEventListener("click",()=>{[0,1,2,3,0].forEach((s,i)=>setTimeout(()=>play(s),i*650));setTimeout(()=>$("#manif").textContent="De la forma pura a la forma útil.",3400)});}
+
+/* ===== cierre ===== */
+$("#dec").addEventListener("click",()=>{const s=$("#stage");s.classList.toggle("split");$("#dec").textContent=s.classList.contains("split")?"Reconstruir":"Deconstruir"});
+
+/* ===== créditos de imágenes ===== */
+$("#imgcred").innerHTML=all.map(o=>`<li>${esc(o.a)}, <i>${esc(o.t)}</i>, ${esc(o.y)}. ${esc(o.col)}.</li>`).join("")+`<li>Vasili Kandinsky, <i>Composición VIII</i>, 1923. Museo Guggenheim, Nueva York.</li><li>Kazimir Malévich, <i>Suprematismo</i>, 1916.</li><li>Fotografía de la Última exposición futurista 0,10, Petrogrado, 1915.</li>`;
+
+/* ===== navegación ===== */
+const scr=[...document.querySelectorAll("section.scr")],ids=scr.map(s=>s.id);
+const cls=s=>s.dataset.mov==="sup"?"s":s.dataset.mov==="con"?"c":s.dataset.mov==="bau"?"b":"";
+$("#dots").innerHTML=scr.map((s,i)=>`<button class="${cls(s)}" data-go="${s.id}" aria-label="${i+1}. ${esc(s.dataset.t)}" title="${esc(s.dataset.t)}"><i></i></button>`).join("");
+$("#toc").innerHTML=scr.map((s,i)=>`<li><button data-go="${s.id}"><span class="n">${String(i+1).padStart(2,"0")}</span><span class="t">${esc(s.dataset.t)}</span></button></li>`).join("");
+let cur=0;
+const go=i=>{i=Math.max(0,Math.min(scr.length-1,i));scr[cur].classList.remove("on");cur=i;scr[i].classList.add("on");
+ document.querySelectorAll("#dots button").forEach((b,j)=>b.setAttribute("aria-current",j===i));
+ $("#where").textContent=`${i+1} / ${scr.length} · ${scr[i].dataset.t}`;$("#bar").style.width=((i+1)/scr.length*100)+"%";
+ $("#prev").disabled=i===0;$("#next").disabled=i===scr.length-1;
+ if(location.hash!=="#"+ids[i])history.replaceState(null,"","#"+ids[i]);window.scrollTo(0,0);requestAnimationFrame(()=>window.scrollTo(0,0))};
+document.addEventListener("click",e=>{const b=e.target.closest("[data-go]");if(b)go(ids.indexOf(b.dataset.go))});
+$("#prev").addEventListener("click",()=>go(cur-1));$("#next").addEventListener("click",()=>go(cur+1));
+document.addEventListener("keydown",e=>{if(e.target.matches("input"))return;if(e.key==="ArrowRight"||e.key==="PageDown")go(cur+1);if(e.key==="ArrowLeft"||e.key==="PageUp")go(cur-1)});
+const fromHash=()=>{const i=ids.indexOf(location.hash.slice(1));go(i<0?0:i)};
+window.addEventListener("hashchange",fromHash);scr[0].classList.add("on");fromHash();
+}
+</script>
+</body>
+</html>
